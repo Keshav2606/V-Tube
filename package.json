@@ -1,0 +1,19 @@
+{
+  "name": "v-tube",
+  "version": "1.0.0",
+  "description": "A Youtube+twitter like backend Clone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "js",
+    "backend",
+    "node",
+    "express",
+    "mongo"
+  ],
+  "author": "Keshav Mishra",
+  "license": "ISC"
+}

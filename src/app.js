@@ -15,12 +15,8 @@ app.use(express.urlencoded({limit: "16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
-app.get('/', (req, res) => {
-    res.send('<h1>Jai Shree Ganesh</h1>');
-});
-
-app.listen(port, () => {
-    console.log(('Express is initiated in the project.'));
-});
+// import routes
+import userRouter from './routes/user.routes.js';
+app.use("/api/v1/users", userRouter)
 
 export default app;

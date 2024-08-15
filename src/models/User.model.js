@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
@@ -27,15 +27,13 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true,
-            trim: true,
         },
         avatar: {
             type: String,
-            trim: true,
+            required: true,
         },
         coverImage: {
             type: String,
-            trim: true,
         },
         watchHistory: [
             {
@@ -52,7 +50,7 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next();
 
-    this.password = await bcrypt(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
@@ -75,7 +73,7 @@ userSchema.methods.generateAccessToken = function () {
     )
 };
 
-userSchema.methods.generateAccessToken = function () {
+userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
             _id: this._id,

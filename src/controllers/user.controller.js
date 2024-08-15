@@ -7,6 +7,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.utils.js';
 export const registerUser = asyncHandler( async (req, res) => {
     // take data from frontend
     const {fullname, username, email, password} = req.body
+    // console.log(email)
 
     // Validate data => Should not empty
     if(
@@ -16,42 +17,47 @@ export const registerUser = asyncHandler( async (req, res) => {
     }
 
     // Check if user already exists.
-    const isUserExists = User.findOne({email})
+    const isUserExists = await User.findOne({
+        $or: [{username}, {email}]
+    })
     if(isUserExists){
-        throw new ApiError(400, "Email Id already registered.")
-    }
-
-    // Check if username already exists.
-    const isUsernameExists = User.findOne({username})
-    if(isUsernameExists){
-        throw new ApiError(400, "Username already exists.")
+        throw new ApiError(400, "User already exists.")
     }
 
     // Check for images and avatar
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+    console.log(avatarLocalPath);
+    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    console.log(coverImageLocalPath);
 
-    if(!avatarLocalPath) throw new ApiError(400, "Avatar is required.");
+    if(!avatarLocalPath){
+        throw new ApiError(409, "Avatar is required.");
+    }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    console.log(avatar);
 
-    if(!avatar) throw new ApiError(400, "Avatar is required.");
+    if(!avatar){
+        throw new ApiError(404, "Avatar is required.");
+    }
+    console.log("Avatar uploaded successfully on cloudinary.")
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    console.log("coverImage uploaded successfully on cloudinary.")
 
     // Create user object and create db entry
     const user = await User.create(
         {
-            username: username.toLowerCase(),
+            username,
             email,
             fullname,
             password,
-            avatar: avatar.url,
+            avatar: avatar?.url || "",
             coverImage: coverImage?.url || "",
         }
     );
 
     // If user created then remove password and refresh token from the user.
-    const createdUser = User.findById(User._id).select("-password -refreshToken");
+    const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
     // Finally check user is created or not.
     if(!createdUser){

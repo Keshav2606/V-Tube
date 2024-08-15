@@ -6,8 +6,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.utils.js';
 
 export const registerUser = asyncHandler( async (req, res) => {
     // take data from frontend
-    const {fullname, username, email, password} = req.body
-    // console.log(email)
+    const {fullname, username, email, password} = req.body;
 
     // Validate data => Should not empty
     if(
@@ -26,9 +25,12 @@ export const registerUser = asyncHandler( async (req, res) => {
 
     // Check for images and avatar
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    console.log(avatarLocalPath);
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
-    console.log(coverImageLocalPath);
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath){
         throw new ApiError(409, "Avatar is required.");

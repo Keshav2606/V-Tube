@@ -38,15 +38,13 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(409, "Avatar is required.");
     }
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    console.log(avatar);
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     if(!avatar){
         throw new ApiError(404, "Avatar is required.");
     }
     console.log("Avatar uploaded successfully on cloudinary.")
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-    console.log("coverImage uploaded successfully on cloudinary.")
 
     // Create user object and create db entry
     const user = await User.create(
@@ -148,8 +146,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             } 
         },
         {
